@@ -1,0 +1,7 @@
+title: field=caption index=T 
+url: field=url boolean=Q unique=Q
+body: field=body index 
+sample: truncate=500 field=sample
+modified: field=lastmod date=unix index=D value=1
+category: field=category index=C
+tags: field=tags index=K

@@ -1,0 +1,67 @@
+##### About ########
+
+Muffet is a web spider written in Perl and Moose. 
+
+The problem that I was trying to solve was to spider newint.org to make a xapian index file, so its targetted at that usage. However, it can spit out xml for a google sitemap or raw text for debugging as well. 
+
+Bear in mind it doesn't respect robots.txt. However you can use a xpath_noindex in pages you want nofollowed. You can also specify the skip_urls parameter, which does a regex match and skips matching urls. 
+
+I don't have the time to offer any kind of support, but I occasionally fix bugs or add features.
+
+########## Usage ###############
+
+usage: muffet.pl [-?] [long options...]
+	-? --usage --help     Prints this usage information.
+	--user                user to attempt http auth with
+	--pass                Password to attempt HTTP auth with
+	--format              Output in this format currently Xapiani, Sitemap or Raw
+	--xpath_body          Where to look for our body data as an XPath expression
+	--xpath_sample        Where to look for our summary data as an XPath expression
+	--xpath_category      Where to look for our title as an XPath expression
+	--xpath_tags          Where to look for our tags as an XPath expression
+	--xpath_title         Where to look for our title in html docs as an XPath expression
+	--xpath_modified      Where to look for our modification time as an XPath expression
+	--xpath_noindex       Where to look for our noindex elements as an XPath expression
+	--xap_db_file         Database file for Xapian output
+	--xap_tmp_file        Temp file for Xapian output defaults to /tmp/muffet.dmp
+	--xap_index_file      Index description file for scriptindex if using Xapian
+	--ignore              Elements to ignore. Should be an array
+	--verbose             Be verbose
+	--debug               Show debugging blurb
+	--skip_inpage         Ignore in-page links e.g. href="#chapter_one"
+	--url                 The URL/s to start spidering from. If you don't say https?://, http:// is inferred
+	--extensions          Valid File Extensions to Spider
+	--skip_urls           URLs containing this/these strings will be skipped
+
+
+########## Examples ###############
+
+ Spider a site with html files and write a sitemap for it with debugging on
+
+./muffet.pl --verbose --debug --extensions html --url example.com --format sitemapxml 
+
+ Spider a site with html files, skipping urls with cgi-bin in them and update our xapian database with what we find
+
+./muffet.pl --url example.com --extensions html --skip_urls cgi-bin --format xapian --xap_index_file /path/to/muffet/xapian.index --xap_tmp_file /tmp/muffet.dmp --xap_db_file /var/www/xapian-omega/db/example/ 
+
+
+ Same thing, specifying xpath expressions for retrieving teaser,body,tags,type,mtime data, authentication and showing verbose messages
+
+./muffet.pl --url example.com --user myuser --pass 's3cr3t' --format xapian --xap_index_file /path/to/muffet/xapian.index --xap_tmp_file /tmp/muffet.dmp --xap_db_file /var/www/xapian-omega/db/example/ --xpath_body //meta[@name="search-teaser"]/@content --xpath_title //meta[@name="search-title"]/@content --xpath_tags=//meta[@name="search-tags"]/@content --xpath_modified //meta[@name="search-mtime"]/@content --xpath_category //meta[@name="search-type"]/@content --verbose
+
+######## Licence ###########
+
+(c) Copyright Charlie Harvey/New Internationalist 2011
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
