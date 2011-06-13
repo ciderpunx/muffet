@@ -175,6 +175,14 @@ has 'skip_urls'  => (
   default   => sub { [] },
   documentation => 'URLs containing this/these strings will be skipped',
 );
+has 'link_tags'  => (
+  traits => ['Array'],
+  is => 'rw', 
+  isa => 'ArrayRef', 
+  required => 0,
+  default   => sub { ['a'] },
+  documentation => 'Only follow link tags of this type eg. a link ',
+);
 has '_extn_regexp' => (
     is            => 'ro',
     isa           => 'str',
@@ -185,6 +193,12 @@ has '_skip_url_regexp' => (
     isa           => 'str',
     required      => 0,
 );
+has '_link_tag_regexp' => (
+    is            => 'ro',
+    isa           => 'str',
+    required      => 0,
+);
+
 
 # starts out the spidering process
 sub start {
@@ -198,6 +212,8 @@ sub start {
   $self->{_extn_regexp} = qr/$regexstr/i;
   $regexstr = '(' . (join "|", @{$self->skip_urls}) . ')';
   $self->{_skip_url_regexp} = qr/$regexstr/i;
+  $regexstr = '(' . (join "|", @{$self->link_tags}) . ')';
+  $self->{_link_tag_regexp} = qr/$regexstr/i;
   
 
   $self->_tidy_base_urls;  
@@ -273,7 +289,10 @@ sub _get_page {
   }
 
   # Grab all links on this host and add to spidering list
-  my @links = $mech->find_all_links(url_abs_regex => qr|^http://$host| ); 
+  my @links = $mech->find_all_links(
+    tag_regex     => $self->_link_tag_regexp, 
+    url_abs_regex => qr|^http://$host| 
+  ); 
   foreach my $a (@links) {
     if ($self->was_seen($a->url_abs->as_string)) {
       $self->_log("Already seen " . $a->url_abs->as_string) if $self->debug;
